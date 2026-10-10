@@ -1,23 +1,12 @@
-# Main entry point 
+# This module is the main entry point that runs fastapi in development or production environment
+# You can use commands like:
+#   1. fastapi dev app/main.py or fastapi run app/main.py --workers 4
+#   2. uvicorn app.main:app  
 
-from fastapi import FastAPI
-from app.api.router import router as api_router
+import uvicorn
+from app.factory import create_app
 
-app = FastAPI()
+app = create_app() # dont put inside any block, put it at top level only so that fastapi cli / uvicorn cli can pick app to run.
 
-app.include_router(api_router)
-
-
-@app.get("/")
-def root():
-    return "Hellow from fastapi"
-
-
-@app.get("/greet")
-def greet(name):
-    return {"message": f"Hellow, unknown"}
-
-
-@app.get("/greet/{name}")
-def greet_user(name: str, greeting: str | None = "Hellow"):
-    return {"message": f"{greeting} {name}"}
+if __name__ == "__main__":
+    uvicorn.run(app)
