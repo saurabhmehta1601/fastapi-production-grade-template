@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_DAYS: int
     ENVIRONMENT: Literal["development", "production"] = "production"
+    LOG_LEVEL: str = "INFO"
 
     model_config = SettingsConfigDict(env_file=".env")
 
