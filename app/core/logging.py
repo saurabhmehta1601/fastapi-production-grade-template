@@ -9,12 +9,12 @@ def configure_logging():
 
     shared_processors = [
         structlog.contextvars.merge_contextvars, # for concurrent requests avoid log overriding with isolated logging context per request
-        structlog.processors.add_log_level, # adds level like Debug, Info
+        structlog.stdlib.add_logger_name, # adds level like Debug, Info
+        structlog.stdlib.add_log_level,
         structlog.processors.TimeStamper(fmt="iso", utc=True), # Add timestamp to log in ISO format.
         structlog.processors.format_exc_info,
     ]
 
-    renderer_processor = None
     if app_settings.ENVIRONMENT == "development":
         renderer_processor = structlog.dev.ConsoleRenderer(colors=True)
     else:
@@ -23,7 +23,11 @@ def configure_logging():
     processors = shared_processors + [renderer_processor]
 
     structlog.configure(
-        processors=processors,
+        processors=shared_processors + [
+            structlog.processors.format_exc_info,
+            # Hand off to stdlib's ProcessorFormatter instead of rendering here
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter
+        ],
         wrapper_class=structlog.stdlib.BoundLogger,
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True
@@ -49,4 +53,3 @@ def configure_logging():
         logger = logging.getLogger(logger_name)
         logger.handlers.clear()
         logger.propagate = True
-
