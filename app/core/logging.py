@@ -20,8 +20,6 @@ def configure_logging():
     else:
         renderer_processor = structlog.processors.JSONRenderer() # convert the log into JSON string
 
-    processors = shared_processors + [renderer_processor]
-
     structlog.configure(
         processors=shared_processors + [
             structlog.processors.format_exc_info,
@@ -53,3 +51,7 @@ def configure_logging():
         logger = logging.getLogger(logger_name)
         logger.handlers.clear()
         logger.propagate = True
+
+        if logger_name == "uvicorn.access":
+            logger.propagate = False # do not look for handlers in parent loggers
+            logger.setLevel(logging.WARNING) # ignore logs for requests logging that has level INFO
