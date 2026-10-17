@@ -3,6 +3,7 @@ import logging
 import structlog
 from app.core.config import Settings, get_settings
 
+LOG_LEVEL=logging.INFO
 
 def configure_logging():
     app_settings: Settings = get_settings()
@@ -44,7 +45,7 @@ def configure_logging():
 
     root_logger = logging.getLogger()
     root_logger.addHandler(handler)
-    root_logger.setLevel(logging.INFO)
+    root_logger.setLevel(LOG_LEVEL)
 
     # Suppress Uvicorn's default verbose loggers and route them to root
     for logger_name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
