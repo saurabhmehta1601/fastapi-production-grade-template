@@ -1,7 +1,6 @@
 import time
 import structlog
-from fastapi import Request, Response
-from fastapi import status
+from fastapi import status, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):

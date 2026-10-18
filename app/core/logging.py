@@ -16,7 +16,7 @@ def configure_logging():
         structlog.processors.format_exc_info,
     ]
 
-    if app_settings.ENVIRONMENT == "development":
+    if app_settings.environment == "development":
         renderer_processor = structlog.dev.ConsoleRenderer(colors=True)
     else:
         renderer_processor = structlog.processors.JSONRenderer() # convert the log into JSON string
