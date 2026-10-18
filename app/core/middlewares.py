@@ -2,6 +2,7 @@ import time
 import structlog
 from fastapi import status, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
+from uuid import uuid4
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
@@ -21,6 +22,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             durationInMS = round((end-start) * 1000, 2)
 
             log_kwargs = {
+                "requestID": request.headers.get("X-Request-ID", str(uuid4())),
                 "clientIP": request.client.host if request.client else "unknown",
                 "path": request.url.path,
                 "method": request.method,

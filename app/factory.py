@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from app.api.router import router as api_router
 from app.core.logging import configure_logging
 from app.core.cors import setup_cors_middleware
-from app.core.middleware import RequestLoggingMiddleware
+from app.core.middlewares import RequestLoggingMiddleware
 
 
 def create_app() -> FastAPI:
