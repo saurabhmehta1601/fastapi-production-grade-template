@@ -8,9 +8,13 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next: callable):
         logger = structlog.getLogger()
+
         start = time.perf_counter()
         response: Response | None = None
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        request_id = request.headers.get("X-Request-ID", str(uuid4()))
+        structlog.contextvars.bind_contextvars(requestID=request_id)
 
         try:
             response = await call_next(request)
@@ -22,7 +26,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             durationInMS = round((end-start) * 1000, 2)
 
             log_kwargs = {
-                "requestID": request.headers.get("X-Request-ID", str(uuid4())),
+                "requestID": request_id,
                 "clientIP": request.client.host if request.client else "unknown",
                 "path": request.url.path,
                 "method": request.method,
@@ -37,4 +41,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             elif status_code >= 200:
                 logger.info("request_success", **log_kwargs)
 
+        if response is not None:
+            response.headers['X-Request-ID'] = request_id
+        
+        structlog.contextvars.clear_contextvars()
+        
         return response
